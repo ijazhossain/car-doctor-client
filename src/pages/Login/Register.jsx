@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../../providers/AuthProvider';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import img from '../../assets/images/login/login.svg'
 
 const Register = () => {
+    const navigate = useNavigate()
     const { createUser } = useContext(AuthContext)
     const handleRegister = (event) => {
         event.preventDefault()
@@ -18,6 +19,7 @@ const Register = () => {
                 .then(result => {
                     const user = result.user;
                     console.log('Registered user', user);
+                    navigate('/')
                 }).catch(error => {
                     console.log(error)
                 })
@@ -67,7 +69,7 @@ const Register = () => {
                                 </label>
                             </div>
                             <div className="form-control mt-6">
-                                <input className='bg-orange-400 py-3 rounded-lg' type="submit" value="Login" />
+                                <input className='bg-orange-400 py-3 rounded-lg' type="submit" value="Register" />
                             </div>
                         </div>
                     </form>

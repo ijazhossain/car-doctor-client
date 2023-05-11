@@ -5,7 +5,49 @@ const Bookings = () => {
     const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([])
     const { _id, img, title, price, email } = bookings;
-    console.log
+
+    const handleDelete = (id) => {
+
+        const confirmed = confirm('Do you want to delete it?');
+        if (confirmed) {
+            fetch(`http://localhost:5000/bookings/${id}`, {
+                method: 'DELETE',
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.deletedCount > 0) {
+                        alert('Deleted successfully')
+                    }
+                    const remaining = bookings.filter(booking => booking._id !== id);
+                    setBookings(remaining)
+                })
+        }
+
+    }
+    const handleBookingConfirm = (id) => {
+        fetch(`http://localhost:5000/bookings/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ status: 'confirm' })
+
+
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                if (data.modifiedCount > 0) {
+                    alert('Order confirmed')
+                    const remaining = bookings.filter(booking => booking._id !== id);
+                    const update = bookings.find(booking => booking._id === id);
+                    update.status = 'confirm'
+                    const newBookings = [update, ...remaining];
+                    setBookings(newBookings)
+                }
+            })
+    }
     const url = `http://localhost:5000/bookings?email=${user?.email}`
     useEffect(() => {
         fetch(url)
@@ -25,7 +67,7 @@ const Bookings = () => {
                         <tr>
                             <th>
                                 <label>
-                                    <input type="checkbox" className="checkbox" />
+                                    Delete
                                 </label>
                             </th>
                             <th>Service Image</th>
@@ -39,9 +81,9 @@ const Bookings = () => {
                         {
                             bookings.map(booking => <tr key={booking._id}>
                                 <th>
-                                    <label>
-                                        <input type="checkbox" className="checkbox" />
-                                    </label>
+                                    <button onClick={() => handleDelete(booking._id)} className="btn btn-circle btn-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
                                 </th>
                                 <td>
                                     <div className="flex items-center space-x-3">
@@ -63,7 +105,8 @@ const Bookings = () => {
                                 <td>{booking.email}</td>
                                 <td className='text-orange-400 font-semibold'>$ {booking.price}</td>
                                 <th>
-                                    <button className="btn btn-ghost btn-xs">details</button>
+                                    {booking?.status === 'confirm' ? <span>Confirmed</span>
+                                        : <button onClick={() => handleBookingConfirm(booking._id)} className="btn btn-ghost btn-xs">Pending</button>}
                                 </th>
                             </tr>)
                         }
