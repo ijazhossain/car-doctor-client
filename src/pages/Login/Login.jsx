@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import img from '../../assets/images/login/login.svg'
 import { AuthContext } from '../../providers/AuthProvider';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import SocialLogin from '../Shared/SocialLogin/SocialLogin';
 
 const Login = () => {
     const { logIn } = useContext(AuthContext);
@@ -19,6 +20,7 @@ const Login = () => {
                 const user = result.user;
                 console.log('logged user', user)
                 navigate(from, { replace: true })
+
             }).catch(error => {
                 console.log(error)
             })
@@ -54,6 +56,7 @@ const Login = () => {
                         </div>
                     </form>
                     <p className='px-5 py-3'>Create an account <Link className='text-orange-400 fw-semibold' to="/register">Register</Link></p>
+                    <SocialLogin></SocialLogin>
                 </div>
             </div>
         </div>

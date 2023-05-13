@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../providers/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const Bookings = () => {
     const { user } = useContext(AuthContext);
     const [bookings, setBookings] = useState([])
     const { _id, img, title, price, email } = bookings;
-
+    const navigate = useNavigate();
     const handleDelete = (id) => {
 
         const confirmed = confirm('Do you want to delete it?');
@@ -48,13 +49,23 @@ const Bookings = () => {
                 }
             })
     }
+    // getting bookings services from DB using email as query
     const url = `http://localhost:5000/bookings?email=${user?.email}`
     useEffect(() => {
-        fetch(url)
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                authorization: `BEARER ${localStorage.getItem('car-access-token')}`
+            }
+        })
             .then(res => res.json())
             .then(data => {
                 console.log(data)
-                setBookings(data)
+                if (!data.error) {
+                    setBookings(data)
+                } else {
+                    navigate('/')
+                }
             })
     }, [])
     return (
